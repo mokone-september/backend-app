@@ -1,3 +1,4 @@
 /node_modules
 /ourApp.db
 /ourApp.db-journal
+/.env
