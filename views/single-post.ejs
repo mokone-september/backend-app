@@ -17,10 +17,11 @@
       </article>
 
       <% if (isAuthor) { %>
-      <a href="/edit-post/<%= post.id %>" class="button">Edit Post</a>
+        <a href="/edit-post/<%= post.id %>" class="button"><small>Edit Post</small></a>
+         
 
       <form style="display: inline" action="/delete-post/<%= post.id %>" method="POST">
-        <br/>
+        
         <button><small> Delete Post</small></button>
           
       </form>
