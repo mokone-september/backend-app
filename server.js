@@ -5,6 +5,31 @@ const sanitizeHTML = require("sanitize-html")
 const bcrypt = require("bcrypt")
 const cookieParser = require("cookie-parser")
 const express = require("express")
+const db = require("better-sqlite3")("ourApp.db")
+db.pragma("journal_mode = WAL")
+
+// Create tables if they don't exist
+const createTables = db.transaction(() => {
+  db.prepare(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username STRING NOT NULL UNIQUE,
+      password STRING NOT NULL
+    )
+  `).run()
+
+  db.prepare(`
+    CREATE TABLE IF NOT EXISTS posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdDate TEXT,
+      title STRING NOT NULL,
+      body TEXT NOT NULL,
+      authorid INTEGER,
+      FOREIGN KEY (authorid) REFERENCES users (id)
+    )
+  `).run()
+})
+createTables()
 
 const app = express()
 
@@ -118,7 +143,7 @@ app.post("/register", (req, res) => {
   if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) errors.push("Username can only contain letters and numbers.")
 
   if (!req.body.password) errors.push("You must provide a password.")
-  if (req.body.password.length < 12) errors.push("Password must be at least 12 characters.")
+  if (req.body.password.length < 10) errors.push("Password must be at least 10 characters.")
   if (req.body.password.length > 70) errors.push("Password cannot exceed 70 characters.")
 
   if (errors.length) {
